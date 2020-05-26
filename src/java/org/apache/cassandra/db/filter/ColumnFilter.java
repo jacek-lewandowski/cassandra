@@ -28,6 +28,7 @@ import org.apache.cassandra.cql3.ColumnIdentifier;
 import org.apache.cassandra.db.*;
 import org.apache.cassandra.db.rows.CellPath;
 import org.apache.cassandra.config.ColumnDefinition;
+import org.apache.cassandra.gms.Gossiper;
 import org.apache.cassandra.io.util.DataInputPlus;
 import org.apache.cassandra.io.util.DataOutputPlus;
 import org.apache.cassandra.net.MessagingService;
@@ -110,7 +111,8 @@ public class ColumnFilter
      */
     public static ColumnFilter selection(CFMetaData metadata, PartitionColumns queried)
     {
-        return new ColumnFilter(true, metadata.partitionColumns(), queried, null);
+        // force set queried columns to null when we are upgrading from 3.0, see CASSANDRA-15833
+        return new ColumnFilter(true, metadata.partitionColumns(), Gossiper.instance.isAnyNodeOn30() ? null : queried, null);
     }
 
     /**
@@ -350,6 +352,9 @@ public class ColumnFilter
                 for (ColumnSubselection subSelection : subSelections)
                     s.put(subSelection.column().name, subSelection);
             }
+
+            if (isFetchAll && Gossiper.instance.isAnyNodeOn30())
+                queried = null; // when upgrading from 3.0, see CASSANDRA-15833
 
             return new ColumnFilter(isFetchAll, isFetchAll ? metadata.partitionColumns() : null, queried, s);
         }

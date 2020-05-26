@@ -18,11 +18,13 @@
 
 package org.apache.cassandra.db.filter;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import junit.framework.Assert;
 import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.ColumnDefinition;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.apache.cassandra.io.util.DataInputBuffer;
@@ -34,6 +36,12 @@ import org.apache.cassandra.utils.ByteBufferUtil;
 public class ColumnFilterTest
 {
     final static ColumnFilter.Serializer serializer = new ColumnFilter.Serializer();
+
+    @BeforeClass
+    public static void beforeClass()
+    {
+        DatabaseDescriptor.clientInitialization();
+    }
 
     @Test
     public void columnFilterSerialisationRoundTrip() throws Exception
