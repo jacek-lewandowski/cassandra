@@ -160,6 +160,12 @@ public class MetadataSerializerTest
     }
 
     @Test
+    public void testMaReadMe() throws IOException
+    {
+        testOldReadsNew("ma", "me");
+    }
+
+    @Test
     public void testMcReadMc() throws IOException
     {
         testOldReadsNew("mc", "mc");

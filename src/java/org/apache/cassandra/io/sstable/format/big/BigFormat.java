@@ -120,6 +120,7 @@ public class BigFormat implements SSTableFormat
         // mb (3.0.7, 3.7): commit log lower bound included
         // mc (3.0.8, 3.9): commit log intervals included
         // md (3.0.18, 3.11.4): corrected sstable min/max clustering
+        // me (3.0.25, 3.11.11): added hostId of the node from which the sstable originated
 
         // na (4.0.0): uncompressed chunks, pending repair session, isTransient, checksummed sstable metadata file, new Bloomfilter format
         //
@@ -130,6 +131,7 @@ public class BigFormat implements SSTableFormat
         private final boolean hasCommitLogLowerBound;
         private final boolean hasCommitLogIntervals;
         private final boolean hasAccurateMinMax;
+        private final boolean hasOriginatingHostId;
         public final boolean hasMaxCompressedLength;
         private final boolean hasPendingRepair;
         private final boolean hasMetadataChecksum;
@@ -151,6 +153,7 @@ public class BigFormat implements SSTableFormat
             hasCommitLogLowerBound = version.compareTo("mb") >= 0;
             hasCommitLogIntervals = version.compareTo("mc") >= 0;
             hasAccurateMinMax = version.compareTo("md") >= 0;
+            hasOriginatingHostId = version.matches("(m[e-z])|(n[a-z])");
             hasMaxCompressedLength = version.compareTo("na") >= 0;
             hasPendingRepair = version.compareTo("na") >= 0;
             hasIsTransient = version.compareTo("na") >= 0;
@@ -214,6 +217,11 @@ public class BigFormat implements SSTableFormat
         public boolean isCompatibleForStreaming()
         {
             return isCompatible() && version.charAt(0) == current_version.charAt(0);
+        }
+
+        public boolean hasOriginatingHostId()
+        {
+            return hasOriginatingHostId;
         }
 
         @Override

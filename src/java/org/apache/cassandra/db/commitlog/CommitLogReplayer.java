@@ -51,6 +51,7 @@ import org.apache.cassandra.schema.Schema;
 import org.apache.cassandra.schema.SchemaConstants;
 import org.apache.cassandra.schema.TableId;
 import org.apache.cassandra.schema.TableMetadataRef;
+import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.WrappedRunnable;
 
@@ -288,8 +289,20 @@ public class CommitLogReplayer implements CommitLogReadHandler
     public static IntervalSet<CommitLogPosition> persistedIntervals(Iterable<SSTableReader> onDisk, CommitLogPosition truncatedAt)
     {
         IntervalSet.Builder<CommitLogPosition> builder = new IntervalSet.Builder<>();
+        List<String> skippedSSTables = new ArrayList<>();
         for (SSTableReader reader : onDisk)
-            builder.addAll(reader.getSSTableMetadata().commitLogIntervals);
+        {
+            UUID originatingHostId = reader.getSSTableMetadata().originatingHostId;
+            if (originatingHostId != null && originatingHostId.equals(StorageService.instance.getLocalHostUUID()))
+                builder.addAll(reader.getSSTableMetadata().commitLogIntervals);
+            else
+                skippedSSTables.add(reader.getFilename());
+        }
+
+        if (!skippedSSTables.isEmpty()) {
+            logger.warn("Origin of {} sstables is unknown or doesn't match the local node; commitLogIntervals for them were ignored", skippedSSTables.size());
+            logger.debug("Ignored commitLogIntervals from the following sstables: {}", skippedSSTables);
+        }
 
         if (truncatedAt != null)
             builder.add(CommitLogPosition.NONE, truncatedAt);

@@ -152,6 +152,7 @@ public abstract class CQLTester
         nativePort = getAutomaticallyAllocatedPort(nativeAddr);
 
         ServerTestUtils.daemonInitialization();
+        StorageService.instance.getTokenMetadata().updateHostId(UUID.randomUUID(), FBUtilities.getBroadcastAddressAndPort());
     }
 
     private List<String> keyspaces = new ArrayList<>();
