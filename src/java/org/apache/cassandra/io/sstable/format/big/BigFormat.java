@@ -112,7 +112,7 @@ public class BigFormat implements SSTableFormat
     // we always incremented the major version.
     static class BigVersion extends Version
     {
-        public static final String current_version = "na";
+        public static final String current_version = "nb";
         public static final String earliest_supported_version = "ma";
 
         // ma (3.0.0): swap bf hash order
@@ -122,7 +122,8 @@ public class BigFormat implements SSTableFormat
         // md (3.0.18, 3.11.4): corrected sstable min/max clustering
         // me (3.0.25, 3.11.11): added hostId of the node from which the sstable originated
 
-        // na (4.0.0): uncompressed chunks, pending repair session, isTransient, checksummed sstable metadata file, new Bloomfilter format
+        // na (4.0-rc1): uncompressed chunks, pending repair session, isTransient, checksummed sstable metadata file, new Bloomfilter format
+        // nb (4.0.0): originating host id
         //
         // NOTE: when adding a new version, please add that to LegacySSTableTest, too.
 
@@ -153,7 +154,7 @@ public class BigFormat implements SSTableFormat
             hasCommitLogLowerBound = version.compareTo("mb") >= 0;
             hasCommitLogIntervals = version.compareTo("mc") >= 0;
             hasAccurateMinMax = version.compareTo("md") >= 0;
-            hasOriginatingHostId = version.matches("(m[e-z])|(n[a-z])");
+            hasOriginatingHostId = version.matches("(m[e-z])|(n[b-z])");
             hasMaxCompressedLength = version.compareTo("na") >= 0;
             hasPendingRepair = version.compareTo("na") >= 0;
             hasIsTransient = version.compareTo("na") >= 0;
