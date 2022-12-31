@@ -333,7 +333,7 @@ public enum CassandraRelevantProperties
      * */
     COMMIT_LOG_REPLAY_LIST("cassandra.replayList", null),
 
-    SSTABLE_FORMAT_DEFAULT("cassandra.sstable.format.default", "BIG")
+    SSTABLE_FORMAT_DEFAULT("cassandra.sstable.format.default", "BTI")
 
     ;
 
